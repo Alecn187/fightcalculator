@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fight Score Calculator</title>
+<style>
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.65); /* dark overlay */
+  z-index: -1;
+}
+
+  body {
+    font-family: Arial, sans-serif;
+    background: url("https://images.squarespace-cdn.com/content/v1/552463cfe4b0735d2b31c505/1429222555109-4X4SEMATQJKCM35MX3P0/free+mma+wallpaper.jpg?format=1000w") no-repeat center center fixed;
+    background-size: cover;
+    color: #f2f2f2; /* off-white text */
+    padding: 20px;
+  }
+
+  h1 {
+    color: #b30000; /* deep blood red */
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  label {
+    display: block;
+    margin-top: 10px;
+  }
+
+  select, input {
+    padding: 6px;
+    margin-top: 5px;
+    width: 260px;
+    border: 1px solid #444;
+    background-color: #262626;
+    color: #f2f2f2;
+  }
+
+.button-container {
+  text-align: center;
+  margin-top: 15px;
+}
+
+  button {
+    background-color: #b30000; /* blood red */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background-color: #800000; /* darker red on hover */
+    animation: pulse 1.5s infinite;
+  }
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+  .result {
+    margin-top: 30px;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #ff3333; /* brighter red to stand out */
+    text-align: center;
+  }
+
+.result strong {
+  text-shadow: 0 0 6px #ff0000, 0 0 12px #b30000;
+}
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #111; /* darker panel */
+    padding: 20px;
+    border: 2px solid #b30000; /* red border frame */
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(179, 0, 0, 0.5);
+  }
+/* Make default checkboxes red with white checkmark */
+input[type="checkbox"] {
+  accent-color: #b30000; /* red box */
+}
+
+.disclaimer {
+  max-width: 600px;
+  margin: 15px auto 0 auto;
+  font-size: 0.75em;
+  color: #888;
+  text-align: center;
+  line-height: 1.4em;
+}
+.tooltip {
+  display: inline-block;
+  position: relative;
+  margin-left: 6px;
+  cursor: help;
+  color: #aaa; /* gray */
+  font-size: 0.9em;
+  border: 1px solid #555;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  line-height: 14px;
+  font-weight: bold;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 220px;
+  background-color: #333;
+  color: #f2f2f2;
+  text-align: left;
+  border-radius: 4px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* position above the icon */
+  left: 50%;
+  margin-left: -110px; /* half of width to center */
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.85em;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>How Many People Could You Beat in a Fight?</h1>
+    
+    <label>Sex:
+      <select id="sex">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+  <span class="tooltip">?
+    <span class="tooltiptext">Males have a slight bonus do to testosterone levels, muscle composition, and bone structure.</span>
+  </span>
+    </label>
+    
+    <label>Age:
+      <select id="age">
+        <option value=1>&lt;13</option>
+        <option value=2>13–17</option>
+        <option value=3>18–40</option>
+        <option value=4>41–50</option>
+        <option value=5>51–65</option>
+        <option value=6>&gt;65</option>
+      </select>
+  <span class="tooltip">?
+    <span class="tooltiptext">Ages 18–40 are neutral (prime years). Younger people lack strength and coordination, while older people face natural decline.</span>
+  </span>
+    </label>
+
+    <label>Height:
+      <select id="height">
+        <option value="1">Under 5'0"</option>
+        <option value="2">5'0"–5'5"</option>
+        <option value="3">5'6"–5'11"</option>
+        <option value="4">6'0"–6'4"</option>
+        <option value="5">6'5" and above</option>
+      </select>
+  <span class="tooltip">?
+    <span class="tooltiptext">Increased height generally benefits from reach and leverage.</span>
+  </span>
+    </label>
+
+    <label>Weight:
+      <select id="weight">
+        <option value="1">Under 100 lbs</option>
+        <option value="2">100–149 lbs</option>
+        <option value="3">150–199 lbs</option>
+        <option value="4">200–249 lbs</option>
+        <option value="5">250 lbs and above</option>
+      </select>
+  <span class="tooltip">?
+    <span class="tooltiptext">More body mass generally adds power and durability.</span>
+  </span>
+    </label>
+
+    <label>Athleticism:
+      <select id="athleticism">
+        <option value="1">Physically Disabled</option>
+        <option value="2">Below Average</option>
+        <option value="3">Average</option>
+        <option value="4">Above Average</option>
+        <option value="5">Gym Goer</option>
+        <option value="6">Elite (college/pro athlete)</option>
+      </select>
+  <span class="tooltip">?
+    <span class="tooltiptext">Higher athleticism improves speed, power, and endurance. Below average limits effectiveness.</span>
+  </span>
+    </label>
+
+    <label>Martial Arts Experience:
+      <select id="experience">
+        <option value="1">None</option>
+        <option value="2">Less than 1 year</option>
+        <option value="3">1–2 years</option>
+        <option value="4">3–4 years</option>
+        <option value="5">5+ years</option>
+        <option value="6">Pro-level / trained with pros</option>
+      </select>
+  <span class="tooltip">?
+    <span class="tooltiptext">Training gives a massive edge. Even a year of real combat sport training provides a huge advantage against the untrained.</span>
+  </span>
+    </label>
+
+    <label>Styles Trained (select all that apply):</label>
+    <label style="margin-left: -100px;"><input type="checkbox" class="style" style="margin-right: -100px;" value="grappling" /> Grappling (BJJ, wrestling, judo, sambo)</label>
+    <label style="margin-left: -100px;"><input type="checkbox" class="style" style="margin-right: -100px;" value="striking" /> Striking (boxing, kickboxing, muay thai)</label>
+    <label style="margin-left: -100px;"><input type="checkbox" class="style" style="margin-right: -100px;" value="mma" /> MMA</label>
+
+    <br><br>
+<div class="button-container">
+  <button onclick="calculate()">Calculate</button>
+</div>
+
+    <div class="result" id="output"></div>
+<canvas id="fightingChart" width="600" height="300"></canvas>
+  </div> <!-- END container -->
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <small><em>
+      Disclaimer: This tool is for entertainment purposes only. Results are broad estimations that tend to favor trained martial artists and larger or more athletic individuals.  
+      They should not be interpreted as predictions of real outcomes or used as encouragement to engage in violence.
+    </em></small>
+  </div>
+
+
+  <script>
+    function calculate() {
+      const sex = document.getElementById("sex").value;
+      const age = document.getElementById("age").value;
+      const height = parseInt(document.getElementById("height").value);
+      const weight = parseInt(document.getElementById("weight").value);
+      const athleticism = parseInt(document.getElementById("athleticism").value);
+      const experience = parseFloat(document.getElementById("experience").value);
+      const styles = Array.from(document.querySelectorAll(".style:checked")).map(cb => cb.value);
+
+      let score = 50; // neutral baseline
+
+      // Sex
+      if (sex === "male") score += 5;
+      if (sex === "female") score -= 5;
+
+      // Age
+      const ageModifiers = {
+        1: -30,
+        2: -10,
+        3: 0,
+        4: -5,
+        5: -10,
+        6: -20
+	};
+      score += ageModifiers[age] || 0;
+
+      // Height bonus
+      const heightMods = {
+	1: -6, 
+	2: -3, 
+	3: 2, 
+	4: 5, 
+	5: 7
+	};
+      score += heightMods[height];
+
+      // Weight bonus
+      const weightMods = {
+	1: -8, 
+	2: -5, 
+	3: 2, 
+	4: 6, 
+	5: 8
+	};
+      score += weightMods[weight];
+
+      // Athleticism
+      const athMods = {
+	1: -20, 
+	2: -5, 
+	3: 0, 
+	4: 5, 
+	5: 10, 
+	6: 20
+	};
+      score += athMods[athleticism];
+
+      // Experience
+      const expMods = {
+	1: 0,      // None
+	2: 5,    // <1 year
+	3: 15,     // 1–2 years
+	4: 25,     // 3–4 years
+	5: 40,     // 5+ years
+	6: 50     // Pro-level
+	};
+      score += expMods[experience];
+
+      // Style bonus
+      if (styles.includes("mma")) {score += 7;} 
+	else {
+        if (styles.includes("grappling")) score += 3;
+        if (styles.includes("striking")) score += 3;
+      }
+
+      // Clamp between 0 and 100
+      score = Math.max(0, Math.min(100, score));
+
+      // Map to percentage of world beaten
+      const percentBeat = 0.01 + (score / 100) * (99.999 - 0.01);
+      const peopleBeat = Math.round((percentBeat / 100) * 8200000000);
+
+      // Ranking labels and descriptions
+      let label = "";
+      let blurb = "";
+      if (percentBeat < 3) { label = "Coughing Baby"; blurb = "You'd could only beat another coughing baby, by hoping it starves before you."; }
+      
+      else if (percentBeat < 10) { label = "Angry Toddler"; blurb = "You'd beat infants, but be powerless against practically everyone else."; }
+      
+      else if (percentBeat < 20) { label = "Frail Elder"; blurb = "You'd beat infants and most toddlers. Any fit person would overwhelm you."; }
+      
+      else if (percentBeat < 30) { label = "Wheelchair-bound"; blurb = "You might overpower children and the elderly, but lose to most able-bodied people."; }
+      
+      else if (percentBeat < 40) { label = "Punching Bag"; blurb = "You could likely handle children, the elderly, and the disabled, but lose to most average adults."; }
+      
+      else if (percentBeat < 50) { label = "Average Jane"; blurb = "You'd safely beat children, the elderly, and the disabled. You'd struggle against more athletic women, many teenagers, and most average men."; }
+      
+      else if (percentBeat < 60) { label = "Average Joe"; blurb = "You'd destroy nearly all children, elderly, and disabled. You'd have an advantage over most teenagers and women, but struggle against larger and/or more athletic adults."; }
+      
+      else if (percentBeat < 70) { label = "Blue-Collar Laborer"; blurb = "You'd destroy all children, elderly, and disabled. You'd safely beat most teenagers and women, but struggle against larger and/or more athletic men. You'd be ragdolled by most casual martial arts hobbyists."; }
+      
+      else if (percentBeat < 80) { label = "Backyard Brawler"; blurb = "You'd destroy all children, elderly, disabled, and most teenagers and women. You'd struggle against larger athletes and those with minor combat training. You'd be manhandled by well-trained martial arts hobbyists."; }
+      
+      else if (percentBeat < 90) { label = "Dangerous Unit"; blurb = "You'd destroy all children, elderly, disabled, and most teenagers and women. You'd have an advantage over many athletes, even those with minor combat training. You'd struggle against elite athletes and well-trained martial arts hobbyists."; }
+      
+      else if (percentBeat < 99) { label = "Street Nightmare"; blurb = "You'd destroy the vast majority of people on earth. All children, elderly, and disabled. Nearly all teenagers, men, and women. You'd have a solid advantage even over most athletes and well-trained martial arts hobbyists, but struggle against truly dedicated martial artists."; }
+      
+      else { label = "Worldbeater / Trained Fighter"; blurb = "You'd dominate nearly all of humanity, even elite athletes and well-trained martial arts hobbyists. Only other truly dedicated martial artists could pose challenge."; }
+
+
+      document.getElementById("output").innerHTML = `
+        You would likely beat <strong>${peopleBeat.toLocaleString()}</strong> people on Earth (~<strong>${percentBeat.toFixed(3)}%</strong>).
+        <br/><br/>Rank: <br/><strong>${label}</strong>
+        <br/><br/><small>${blurb}</small>
+	<br/><br/>
+      `;
+
+// --- Chart setup with skewed distribution + percentile-based marker ---
+const labels = Array.from({length: 101}, (_, i) => i);
+
+// Gaussian helper
+function gaussian(x, mean, sd, scale) {
+  return scale * Math.exp(-0.5 * Math.pow((x - mean) / sd, 2));
+}
+
+// Build smoother, bulkier density curve
+const density = labels.map(x =>
+  gaussian(x, 5, 6, 0.03) +       // very bulky babies/disabled/elderly
+  gaussian(x, 20, 8, 0.02) +      // children/teens
+  gaussian(x, 45, 15, 0.025) +    // bulk of average adults
+  gaussian(x, 70, 10, 0.015) +    // strong/athletic
+  gaussian(x, 90, 5, 0.004)       // elite
+);
+
+
+// --- Normalize density & compute CDF ---
+const totalArea = density.reduce((a, b) => a + b, 0);
+const normalized = density.map(y => y / totalArea);
+
+let cumulative = 0;
+const cdf = normalized.map(y => {
+  cumulative += y;
+  return cumulative;
+});
+
+// --- Invert CDF to find user percentile ---
+const targetPercent = percentBeat / 100; 
+let userX = labels[0]; 
+for (let i = 0; i < cdf.length; i++) {
+  if (cdf[i] >= targetPercent) {
+    userX = labels[i];
+    break;
+  }
+}
+
+// Destroy old chart if exists
+if (window.fightChart) window.fightChart.destroy();
+const ctx = document.getElementById("fightingChart");
+
+// Plugin to draw vertical "YOU" line
+const markerPlugin = {
+  id: 'markerPlugin',
+  afterDatasetsDraw(chart) {
+    const {ctx, chartArea: {top, bottom}, scales: {x}} = chart;
+    const xPos = x.getPixelForValue(userX);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(xPos, top);
+    ctx.lineTo(xPos, bottom);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "white";
+    ctx.stroke();
+
+    ctx.font = "bold 14px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.restore();
+  }
+};
+
+window.fightChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: "Population Distribution",
+        data: density,
+        borderColor: "red",
+        backgroundColor: "rgba(179,0,0,0.3)",
+        tension: 0.4,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 0
+      }
+    ]
+  },
+  options: {
+    layout: {
+      padding: {
+        top: 30  // increase this number if you need more space
+        }
+      },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: "Fighting Ability" },
+        ticks: { display: false }
+      },
+      y: {
+        title: { display: true, text: "Population Density" },
+        ticks: { display: false }
+      }
+    }
+  },
+  plugins: [markerPlugin, sectionPlugin]
+});
+    }
+
+// Plugin for shaded background sections + labels
+const sectionPlugin = {
+  id: 'sectionPlugin',
+  beforeDraw(chart) {
+    const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+
+    // Define sections (start, end, color, label)
+    const sections = [
+      { start: 0, end: 33, color: "rgba(0,255,0,0.05)", label: "Children, Elderly, Disabled" },
+      { start: 33, end: 56.5, color: "rgba(0,0,255,0.05)", label: "Average Adults" },
+      { start: 56.5, end: 80, color: "rgba(0,100,255,0.05)", label: "Larger / Athletic Adults" },
+      { start: 80, end: 100, color: "rgba(255,0,0,0.05)", label: "Elite Athletes / Fighters" }
+    ];
+
+    ctx.save();
+    sections.forEach(s => {
+      const xStart = x.getPixelForValue(s.start);
+      const xEnd = x.getPixelForValue(s.end);
+
+      // Draw shaded background
+      ctx.fillStyle = s.color;
+      ctx.fillRect(xStart, top, xEnd - xStart, bottom - top);
+
+      // Draw label in the middle
+      ctx.fillStyle = "gray";
+      ctx.font = "10px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(s.label, (xStart + xEnd) / 2, top - 10);
+    });
+    ctx.restore();
+  }
+};
+
+
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mmaCheckbox = document.querySelector('input[value="mma"]');
+      const grapplingCheckbox = document.querySelector('input[value="grappling"]');
+      const strikingCheckbox = document.querySelector('input[value="striking"]');
+      const styleCheckboxes = [mmaCheckbox, grapplingCheckbox, strikingCheckbox];
+      const experienceSelect = document.getElementById("experience");
+
+      // MMA logic: lock others when MMA is selected
+      mmaCheckbox.addEventListener('change', () => {
+        if (mmaCheckbox.checked) {
+          grapplingCheckbox.checked = false;
+          strikingCheckbox.checked = false;
+          grapplingCheckbox.disabled = true;
+          strikingCheckbox.disabled = true;
+        } else {
+          grapplingCheckbox.disabled = false;
+          strikingCheckbox.disabled = false;
+        }
+      });
+
+      // Disable style checkboxes if no experience
+      function toggleStylesBasedOnExperience() {
+        const experience = parseFloat(experienceSelect.value);
+        const shouldDisable = experience === 1;
+
+        styleCheckboxes.forEach(cb => {
+          cb.disabled = shouldDisable;
+          if (shouldDisable) cb.checked = false;
+        });
+
+        // If re-enabling and MMA is selected, disable the others again
+        if (!shouldDisable && mmaCheckbox.checked) {
+          grapplingCheckbox.disabled = true;
+          strikingCheckbox.disabled = true;
+        }
+      }
+
+      toggleStylesBasedOnExperience();
+      experienceSelect.addEventListener("change", toggleStylesBasedOnExperience);
+    });
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</body>
+</html>
